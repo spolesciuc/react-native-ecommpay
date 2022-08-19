@@ -8,6 +8,7 @@ import {
   View,
 } from 'react-native';
 import {
+  ActionType,
   addEcmpScreenDisplayMode,
   createPayment,
   ECMPPaymentInfo,
@@ -15,6 +16,7 @@ import {
   PaymentDataRequest,
   presentPayment,
   RecurrentType,
+  setAction,
   setApplePayDescription,
   setForcePaymentMethod,
   setMerchantID,
@@ -76,6 +78,8 @@ export default function App() {
       };
 
       await createPayment(info);
+
+      await setAction(ActionType.Verify);
 
       await setTheme({
         actionButtonBackgroundColor: '#fff',

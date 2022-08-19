@@ -36,6 +36,7 @@ public class EcommpayModule extends ReactContextBaseJavaModule {
   private static final String E_ACTIVITY_DOES_NOT_EXIST = "E_ACTIVITY_DOES_NOT_EXIST";
   private static final String PAYMENT_INFO_DOES_NOT_EXIST = "PAYMENT_INFO_DOES_NOT_EXIST";
   private static final String PAYMENT_INFO_DOES_NOT_EXIST_DESCRIPTION = "Object PaymentInfo does not exist, execute initPayment method";
+  private static final String ACTION_DOES_NOT_EXIST = "ACTION_DOES_NOT_EXIST";
 
   private final ReactApplicationContext reactContext;
   private static final int PAY_ACTIVITY_REQUEST = 888;
@@ -195,6 +196,40 @@ public class EcommpayModule extends ReactContextBaseJavaModule {
       ECMPRecurrentInfo recurrentInfo = RecurrentInfoUtility.bind(recurrent, schedules);
       paymentInfo.setRecurrent(recurrentInfo);
       promise.resolve(true);
+    } catch (Exception e) {
+      promise.reject(e);
+    }
+  }
+
+
+  @ReactMethod
+  public void setAction(final Integer action, Promise promise) {
+    if (paymentInfo == null) {
+      promise.reject(PAYMENT_INFO_DOES_NOT_EXIST, PAYMENT_INFO_DOES_NOT_EXIST_DESCRIPTION);
+    }
+    try {
+      switch (action) {
+        case 1: {
+          paymentInfo.setAction(ECMPPaymentInfo.ActionType.Sale);
+          break;
+        }
+        case 2: {
+          paymentInfo.setAction(ECMPPaymentInfo.ActionType.Auth);
+          break;
+        }
+        case 3: {
+          paymentInfo.setAction(ECMPPaymentInfo.ActionType.Tokenize);
+          break;
+        }
+        case 4: {
+          paymentInfo.setAction(ECMPPaymentInfo.ActionType.Verify);
+          break;
+        }
+        default: {
+          promise.reject(ACTION_DOES_NOT_EXIST, "Action " + action + "doesn't exist");
+        }
+      }
+      promise.resolve(action);
     } catch (Exception e) {
       promise.reject(e);
     }

@@ -5,8 +5,9 @@ import ecommpaySDK
 
 @objc(Ecommpay)
 class Ecommpay: RCTEventEmitter {
-  let ecompaySDK = EcommpaySDK()
+  var ecommpaySDK: EcommpaySDK? = nil
   var paymentInfo: PaymentInfo?
+  private var presentQueue: DispatchWorkItem?
 
   static let RESULT_SUCCESS = 0
   static let RESULT_DECLINE = 100
@@ -15,6 +16,7 @@ class Ecommpay: RCTEventEmitter {
   static let INIT_FAILED = 601
 
   static let PAYMENT_INFO_DOES_NOT_EXIST = "PAYMENT_INFO_DOES_NOT_EXIST"
+  static let ACTION_DOES_NOT_EXIST = "ACTION_DOES_NOT_EXIST"
   static let PAYMENT_INFO_DOES_NOT_EXIST_DESCRIPTION =
     "Object PaymentInfo does not exist, execute initPayment method"
 
@@ -23,6 +25,9 @@ class Ecommpay: RCTEventEmitter {
     info: NSDictionary, resolve: @escaping RCTPromiseResolveBlock,
     reject: @escaping RCTPromiseRejectBlock
   ) {
+    presentQueue?.cancel()
+    ecommpaySDK = EcommpaySDK()
+
     paymentInfo = PaymentInfoUtility.bind(info: info)
     resolve(true)
   }
@@ -33,7 +38,7 @@ class Ecommpay: RCTEventEmitter {
     reject: @escaping RCTPromiseRejectBlock
   ) {
     let theme = ThemeUtility.bind(info: options, isDark: isDark)
-    ecompaySDK.setTheme(theme: theme)
+    ecommpaySDK?.setTheme(theme: theme)
     resolve(true)
   }
 
@@ -133,8 +138,70 @@ class Ecommpay: RCTEventEmitter {
         userInfo: [NSLocalizedDescriptionKey: Ecommpay.PAYMENT_INFO_DOES_NOT_EXIST_DESCRIPTION])
       reject(Ecommpay.PAYMENT_INFO_DOES_NOT_EXIST, error.userInfo.description, error)
     }
-
   }
+
+  @objc(addEcmpScreenDisplayMode:withResolver:withRejecter:)
+  func addEcmpScreenDisplayMode(
+    displayMode: String, resolve: @escaping RCTPromiseResolveBlock,
+    reject: @escaping RCTPromiseRejectBlock
+  ) {
+    if paymentInfo != nil {
+      resolve(paymentInfo?.addScreenDisplayMode(value: displayMode))
+    } else {
+      let error = NSError(
+        domain: "", code: Ecommpay.INIT_FAILED,
+        userInfo: [NSLocalizedDescriptionKey: Ecommpay.PAYMENT_INFO_DOES_NOT_EXIST_DESCRIPTION])
+      reject(Ecommpay.PAYMENT_INFO_DOES_NOT_EXIST, error.userInfo.description, error)
+    }
+  }
+
+  @objc(setAction:withResolver:withRejecter:)
+  func setAction(
+    action: NSNumber, resolve: @escaping RCTPromiseResolveBlock,
+    reject: @escaping RCTPromiseRejectBlock
+  ) {
+    if paymentInfo != nil {
+
+      switch action {
+      case 1:
+        do {
+          paymentInfo?.setAction(action: .Sale)
+          break
+        }
+      case 2:
+        do {
+          paymentInfo?.setAction(action: .Auth)
+          break
+        }
+      case 3:
+        do {
+          paymentInfo?.setAction(action: .Tokenize)
+          break
+        }
+      case 4:
+        do {
+          paymentInfo?.setAction(action: .Verify)
+          break
+        }
+      default:
+        do {
+          let errorMessage = "Action doesn't exist"
+          let error = NSError(
+            domain: "", code: Ecommpay.INIT_FAILED,
+            userInfo: [NSLocalizedDescriptionKey: errorMessage])
+
+          reject(Ecommpay.ACTION_DOES_NOT_EXIST, errorMessage, error)
+        }
+      }
+      resolve(action)
+    } else {
+      let error = NSError(
+        domain: "", code: Ecommpay.INIT_FAILED,
+        userInfo: [NSLocalizedDescriptionKey: Ecommpay.PAYMENT_INFO_DOES_NOT_EXIST_DESCRIPTION])
+      reject(Ecommpay.PAYMENT_INFO_DOES_NOT_EXIST, error.userInfo.description, error)
+    }
+  }
+  
 
   @objc(presentPayment:withRejecter:)
   func presentPayment(
@@ -144,10 +211,9 @@ class Ecommpay: RCTEventEmitter {
     if paymentInfo != nil {
       let payment = paymentInfo!
 
-      DispatchQueue.main.async(execute: {
+      presentQueue = DispatchWorkItem {
         let rootViewController = (UIApplication.shared.delegate?.window??.rootViewController)!
-
-        self.ecompaySDK.presentPayment(at: rootViewController, paymentInfo: payment) { (result) in
+        self.ecommpaySDK?.presentPayment(at: rootViewController, paymentInfo: payment) { (result) in
           print("ecommpaySDK finished with status \(result.status.rawValue)")
 
           let status = result.status
@@ -178,8 +244,13 @@ class Ecommpay: RCTEventEmitter {
                 body: ["errorMessage": errorMessage, "status": status.rawValue])
             }
           }
+
+          self.ecommpaySDK = nil
         }
-      })
+      }
+
+      DispatchQueue.main.async(execute: presentQueue!)
+
     } else {
       let error = NSError(
         domain: "", code: Ecommpay.INIT_FAILED,

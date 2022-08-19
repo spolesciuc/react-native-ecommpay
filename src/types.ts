@@ -54,13 +54,6 @@ export interface PaymentDataRequest {
   transactionInfo: TransactionInfo;
 }
 
-export enum ActionType {
-  Sale,
-  Auth,
-  Tokenize,
-  Verify,
-}
-
 export interface AndroidTheme {
   overlayColor?: Maybe<string>;
   statusBarColor?: Maybe<string>;
@@ -191,4 +184,11 @@ export interface RecurrentInfo {
   startDate?: Maybe<string>;
   scheduledPaymentID?: Maybe<string>;
   amount?: Maybe<number>;
+}
+
+export enum ActionType {
+  Sale = 1,
+  Auth = 2,
+  Tokenize = 3,
+  Verify = 4,
 }
