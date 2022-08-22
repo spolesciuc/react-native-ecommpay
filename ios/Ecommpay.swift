@@ -8,6 +8,7 @@ class Ecommpay: RCTEventEmitter {
   var ecommpaySDK: EcommpaySDK? = nil
   var paymentInfo: PaymentInfo?
   private var presentQueue: DispatchWorkItem?
+  private var theme: ecommpaySDK.ECPTheme? = nil
 
   static let RESULT_SUCCESS = 0
   static let RESULT_DECLINE = 100
@@ -27,7 +28,9 @@ class Ecommpay: RCTEventEmitter {
   ) {
     presentQueue?.cancel()
     ecommpaySDK = EcommpaySDK()
-
+    if theme != nil {
+      ecommpaySDK?.setTheme(theme: theme!)
+    }
     paymentInfo = PaymentInfoUtility.bind(info: info)
     resolve(true)
   }
@@ -37,8 +40,8 @@ class Ecommpay: RCTEventEmitter {
     options: NSDictionary, isDark: Bool, resolve: @escaping RCTPromiseResolveBlock,
     reject: @escaping RCTPromiseRejectBlock
   ) {
-    let theme = ThemeUtility.bind(info: options, isDark: isDark)
-    ecommpaySDK?.setTheme(theme: theme)
+    theme = ThemeUtility.bind(info: options, isDark: isDark)
+    ecommpaySDK?.setTheme(theme: theme!)
     resolve(true)
   }
 
@@ -201,7 +204,6 @@ class Ecommpay: RCTEventEmitter {
       reject(Ecommpay.PAYMENT_INFO_DOES_NOT_EXIST, error.userInfo.description, error)
     }
   }
-  
 
   @objc(presentPayment:withRejecter:)
   func presentPayment(
