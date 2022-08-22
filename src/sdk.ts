@@ -68,7 +68,7 @@ export function setSignature(signature: string): Promise<string> {
 }
 
 export function setAction(action: ActionType): Promise<string> {
-  return EcommpayNative.setAction(action);
+  return EcommpayNative.setAction(+action);
 }
 
 export function presentPayment(

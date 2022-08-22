@@ -7,23 +7,11 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {
+import Ecommpay, {
   ActionType,
-  addEcmpScreenDisplayMode,
-  createPayment,
   ECMPPaymentInfo,
-  getParamsForSignature,
   PaymentDataRequest,
-  presentPayment,
   RecurrentType,
-  setAction,
-  setApplePayDescription,
-  setForcePaymentMethod,
-  setMerchantID,
-  setPaymentDataRequest,
-  setRecurrent,
-  setSignature,
-  setTheme,
 } from 'react-native-ecommpay';
 
 export default function App() {
@@ -77,22 +65,22 @@ export default function App() {
         regionCode: null,
       };
 
-      await createPayment(info);
+      await Ecommpay.createPayment(info);
 
-      await setAction(ActionType.Verify);
+      await Ecommpay.setAction(ActionType.Verify);
 
-      await setTheme({
+      await Ecommpay.setTheme({
         actionButtonBackgroundColor: '#fff',
         showShadow: true,
       });
 
-      const signature = await getParamsForSignature();
+      const signature = await Ecommpay.getParamsForSignature();
       console.log(signature, '@signature');
 
-      await setForcePaymentMethod('alipay');
-      await setMerchantID('com.merchant.test');
+      await Ecommpay.setForcePaymentMethod('alipay');
+      await Ecommpay.setMerchantID('com.merchant.test');
 
-      await setRecurrent(
+      await Ecommpay.setRecurrent(
         {
           type: RecurrentType.Regular,
           amount: 1000,
@@ -106,27 +94,27 @@ export default function App() {
         ]
       );
 
-      await setSignature('generated signature');
+      await Ecommpay.setSignature('generated signature');
 
-      await addEcmpScreenDisplayMode('hide_decline_final_page');
-      await addEcmpScreenDisplayMode('hide_success_final_page');
+      await Ecommpay.addEcmpScreenDisplayMode('hide_decline_final_page');
+      await Ecommpay.addEcmpScreenDisplayMode('hide_success_final_page');
 
       switch (Platform.OS) {
         case 'android': {
-          await setPaymentDataRequest(
+          await Ecommpay.setPaymentDataRequest(
             generatePaymentRequest(paymentAmount, paymentCurrency)
           );
           break;
         }
         case 'ios': {
-          await setApplePayDescription('description');
+          await Ecommpay.setApplePayDescription('description');
           break;
         }
       }
 
       console.log('Present payment form');
 
-      await presentPayment();
+      await Ecommpay.presentPayment();
     })();
   }, [generatePaymentRequest]);
 

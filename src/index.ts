@@ -1,3 +1,6 @@
-export * from './types';
+import * as Ecommpay from './sdk';
 
-export * from './native';
+export * from './types';
+export * from './sdk';
+
+export default Ecommpay;
