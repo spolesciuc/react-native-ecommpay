@@ -62,6 +62,11 @@ RCT_EXTERN_METHOD(setHideSavedWallets
                 : (RCTPromiseResolveBlock)resolve withRejecter
                 : (RCTPromiseRejectBlock)reject)
 
+RCT_EXTERN_METHOD(setLanguageCode
+                : (NSString)value withResolver
+                : (RCTPromiseResolveBlock)resolve withRejecter
+                : (RCTPromiseRejectBlock)reject)
+
 RCT_EXTERN_METHOD(presentPayment
                   : (RCTPromiseResolveBlock)resolve withRejecter
                   : (RCTPromiseRejectBlock)reject)

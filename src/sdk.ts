@@ -75,6 +75,10 @@ export function setHideSavedWallets(value: boolean): Promise<boolean> {
   return EcommpayNative.setHideSavedWallets(value);
 }
 
+export function setLanguageCode(value: string): Promise<string> {
+  return EcommpayNative.setLanguageCode(value);
+}
+
 export function presentPayment(
   onSuccess?: CallbackResponseType,
   onError?: CallbackResponseType,
