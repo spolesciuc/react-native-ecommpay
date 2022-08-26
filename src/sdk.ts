@@ -71,6 +71,10 @@ export function setAction(action: ActionType): Promise<string> {
   return EcommpayNative.setAction(+action);
 }
 
+export function setHideSavedWallets(value: boolean): Promise<boolean> {
+  return EcommpayNative.setHideSavedWallets(value);
+}
+
 export function presentPayment(
   onSuccess?: CallbackResponseType,
   onError?: CallbackResponseType,

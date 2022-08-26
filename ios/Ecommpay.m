@@ -57,6 +57,11 @@ RCT_EXTERN_METHOD(addEcmpScreenDisplayMode
                   : (RCTPromiseResolveBlock)resolve withRejecter
                   : (RCTPromiseRejectBlock)reject)
 
+RCT_EXTERN_METHOD(setHideSavedWallets
+                : (BOOL)value withResolver
+                : (RCTPromiseResolveBlock)resolve withRejecter
+                : (RCTPromiseRejectBlock)reject)
+
 RCT_EXTERN_METHOD(presentPayment
                   : (RCTPromiseResolveBlock)resolve withRejecter
                   : (RCTPromiseRejectBlock)reject)

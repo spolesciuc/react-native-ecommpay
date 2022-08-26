@@ -186,7 +186,6 @@ public class EcommpayModule extends ReactContextBaseJavaModule {
     }
   }
 
-
   @ReactMethod
   public void setRecurrent(ReadableMap recurrent, ReadableArray schedules, Promise promise) {
     if (paymentInfo == null) {
@@ -201,6 +200,18 @@ public class EcommpayModule extends ReactContextBaseJavaModule {
     }
   }
 
+  @ReactMethod
+  public void setHideSavedWallets(Boolean value, Promise promise) {
+    if (paymentInfo == null) {
+      promise.reject(PAYMENT_INFO_DOES_NOT_EXIST, PAYMENT_INFO_DOES_NOT_EXIST_DESCRIPTION);
+    }
+    try {
+      paymentInfo.setHideSavedWallets(value);
+      promise.resolve(value);
+    } catch (Exception e) {
+      promise.reject(e);
+    }
+  }
 
   @ReactMethod
   public void setAction(final Integer action, Promise promise) {

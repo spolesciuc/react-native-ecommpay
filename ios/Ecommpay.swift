@@ -205,6 +205,24 @@ class Ecommpay: RCTEventEmitter {
     }
   }
 
+
+  @objc(setHideSavedWallets:withResolver:withRejecter:)
+  func setHideSavedWallets(
+    value: Bool, resolve: @escaping RCTPromiseResolveBlock,
+    reject: @escaping RCTPromiseRejectBlock
+  ) {
+    if paymentInfo != nil {
+      paymentInfo?.setHideSavedWallets(value: value)
+      resolve(value)
+
+    } else {
+      let error = NSError(
+        domain: "", code: Ecommpay.INIT_FAILED,
+        userInfo: [NSLocalizedDescriptionKey: Ecommpay.PAYMENT_INFO_DOES_NOT_EXIST_DESCRIPTION])
+      reject(Ecommpay.PAYMENT_INFO_DOES_NOT_EXIST, error.userInfo.description, error)
+    }
+  }
+
   @objc(presentPayment:withRejecter:)
   func presentPayment(
     resolve: @escaping RCTPromiseResolveBlock,
