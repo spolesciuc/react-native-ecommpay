@@ -11,7 +11,32 @@ import ecommpaySDK
 public class RecurrentInfoUtility {
   static func bind(recurrent: NSDictionary, schedules: NSArray) -> RecurrentInfo {
 
-    let type = recurrent["type"] as? ecommpaySDK.RecurrentType ?? RecurrentType.Regular
+    var type = RecurrentType.OneClick
+
+    let typeStr = recurrent["type"] as? String
+
+    switch typeStr {
+    case "R":
+      do {
+        type = RecurrentType.Regular
+        break
+      }
+    case "C":
+      do {
+        type = RecurrentType.OneClick
+        break
+      }
+    case "U":
+      do {
+        type = RecurrentType.Autopayment
+        break
+      }
+    default:
+      do {
+        type = RecurrentType.Autopayment
+      }
+    }
+
     let expiryDay = recurrent["expiryDay"] as? String ?? nil
     let expiryMonth = recurrent["expiryMonth"] as? String ?? nil
     let expiryYear = recurrent["expiryYear"] as? String ?? nil

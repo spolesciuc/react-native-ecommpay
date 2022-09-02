@@ -82,7 +82,7 @@ export default function App() {
 
       await Ecommpay.setRecurrent(
         {
-          type: RecurrentType.Regular,
+          type: RecurrentType.OneClick,
           amount: 1000,
           scheduledPaymentID: '100',
         },
