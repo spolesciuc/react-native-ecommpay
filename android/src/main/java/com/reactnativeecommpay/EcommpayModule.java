@@ -41,7 +41,7 @@ public class EcommpayModule extends ReactContextBaseJavaModule {
   private final ReactApplicationContext reactContext;
   private static final int PAY_ACTIVITY_REQUEST = 888;
   ECMPPaymentInfo paymentInfo;
-  ECMPTheme theme;
+  ECMPTheme theme = ECMPTheme.getLightTheme();
 
   public EcommpayModule(ReactApplicationContext reactContext) {
     super(reactContext);
@@ -89,10 +89,12 @@ public class EcommpayModule extends ReactContextBaseJavaModule {
     return NAME;
   }
 
+
+
   @ReactMethod
-  public void createPayment(ReadableMap info, Promise promise) {
+  public void setTheme(ReadableMap options, @Nullable Boolean isDark, Promise promise) {
     try {
-      paymentInfo = PaymentInfoUtility.bind(info);
+      theme = ThemeUtility.bind(options, isDark);
       promise.resolve(true);
     } catch (Exception e) {
       promise.reject(e);
@@ -100,9 +102,9 @@ public class EcommpayModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void setTheme(ReadableMap options, @Nullable Boolean isDark, Promise promise) {
+  public void createPayment(ReadableMap info, Promise promise) {
     try {
-      theme = ThemeUtility.bind(options, isDark);
+      paymentInfo = PaymentInfoUtility.bind(info);
       promise.resolve(true);
     } catch (Exception e) {
       promise.reject(e);

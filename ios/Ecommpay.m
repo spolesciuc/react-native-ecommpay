@@ -46,9 +46,8 @@ RCT_EXTERN_METHOD(setRecurrent
                   : (RCTPromiseResolveBlock)resolve withRejecter
                   : (RCTPromiseRejectBlock)reject)
 
-
 RCT_EXTERN_METHOD(setAction
-                  : (NSNumber)action withResolver
+                  : (nonnull NSNumber)action withResolver
                   : (RCTPromiseResolveBlock)resolve withRejecter
                   : (RCTPromiseRejectBlock)reject)
 
