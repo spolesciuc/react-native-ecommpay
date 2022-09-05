@@ -16,8 +16,7 @@ public class PaymentInfoUtility {
 
 
     if (TypeUtility.stringIsNotEmpty(paymentId) && TypeUtility.stringIsNotEmpty(paymentCurrency) &&
-      TypeUtility.stringIsNotEmpty(paymentDescription) && TypeUtility.stringIsNotEmpty(customerId) &&
-      TypeUtility.stringIsNotEmpty(regionCode)) {
+      TypeUtility.stringIsNotEmpty(paymentDescription) && TypeUtility.stringIsNotEmpty(customerId)) {
       return new ECMPPaymentInfo(
         projectId,
         paymentId,
