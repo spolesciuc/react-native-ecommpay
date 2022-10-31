@@ -20,7 +20,7 @@ def safeExtGet(prop, fallback) {
 android {
     compileSdkVersion safeExtGet('Ecommpay_compileSdkVersion', 29)
     defaultConfig {
-        minSdkVersion safeExtGet('Ecommpay_minSdkVersion', 17)
+        minSdkVersion safeExtGet('Ecommpay_minSdkVersion', 21)
         targetSdkVersion safeExtGet('Ecommpay_targetSdkVersion', 29)
         versionCode 1
         versionName "1.0"
