@@ -75,7 +75,7 @@ PODS:
   - glog (0.3.5)
   - libevent (2.1.12)
   - OpenSSL-Universal (1.1.1100)
-  - Paymentpage-sdk-ios (1.15.0)
+  - Paymentpage-sdk-ios (1.16.1)
   - RCT-Folly (2021.06.28.00-v2):
     - boost
     - DoubleConversion
@@ -283,8 +283,8 @@ PODS:
   - React-jsinspector (0.68.5)
   - React-logger (0.68.5):
     - glog
-  - react-native-ecommpay (0.1.11):
-    - Paymentpage-sdk-ios (= 1.15.0)
+  - react-native-ecommpay (0.1.12):
+    - Paymentpage-sdk-ios (= 1.16.1)
     - React-Core
   - React-perflogger (0.68.5)
   - React-RCTActionSheet (0.68.5):
@@ -518,7 +518,7 @@ SPEC CHECKSUMS:
   glog: 476ee3e89abb49e07f822b48323c51c57124b572
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
   OpenSSL-Universal: ebc357f1e6bc71fa463ccb2fe676756aff50e88c
-  Paymentpage-sdk-ios: ab0d1947380bbfa5ae12c29498c550203d17d833
+  Paymentpage-sdk-ios: fc46288de34d5e74c36573ac8a2cb83fdb6eceea
   RCT-Folly: 4d8508a426467c48885f1151029bc15fa5d7b3b8
   RCTRequired: 0f06b6068f530932d10e1a01a5352fad4eaacb74
   RCTTypeSafety: b0ee81f10ef1b7d977605a2b266823dabd565e65
@@ -532,7 +532,7 @@ SPEC CHECKSUMS:
   React-jsiexecutor: 45c0496ca8cef6b02d9fa0274c25cf458fe91a56
   React-jsinspector: eb202e43b3879aba9a14f3f65788aec85d4e1ea9
   React-logger: 98f663b292a60967ebbc6d803ae96c1381183b6d
-  react-native-ecommpay: 3abd8b728dff197cce8c8570a85da867c568542d
+  react-native-ecommpay: 754f0f66e47d826e576e7b3391ceb99e3b60a6a5
   React-perflogger: 0458a87ea9a7342079e7a31b0d32b3734fb8415f
   React-RCTActionSheet: 22538001ea2926dea001111dd2846c13a0730bc9
   React-RCTAnimation: 732ce66878d4aa151d56a0d142b1105aa12fd313
