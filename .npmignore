@@ -3,3 +3,4 @@ src
 .eslintrc
 .prettierrc
 tsconfig.json
+!/example/vendor/
