@@ -2,7 +2,7 @@ package com.reactnativeecommpay;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Color;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -24,14 +24,21 @@ import com.facebook.react.module.annotations.ReactModule;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.facebook.react.bridge.Arguments;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.wallet.IsReadyToPayRequest;
 import com.google.android.gms.wallet.PaymentDataRequest;
+import com.google.android.gms.wallet.PaymentsClient;
+import com.google.android.gms.wallet.Wallet;
+import com.google.android.gms.wallet.WalletConstants;
 import com.reactnativeecommpay.utils.RecurrentInfoUtility;
 import com.reactnativeecommpay.utils.ThemeUtility;
 import com.reactnativeecommpay.utils.PaymentInfoUtility;
 
+
 import java.util.Objects;
+
 
 
 @ReactModule(name = EcommpayModule.NAME)
@@ -41,6 +48,7 @@ public class EcommpayModule extends ReactContextBaseJavaModule {
   private static final String PAYMENT_INFO_DOES_NOT_EXIST = "PAYMENT_INFO_DOES_NOT_EXIST";
   private static final String PAYMENT_INFO_DOES_NOT_EXIST_DESCRIPTION = "Object PaymentInfo does not exist, execute initPayment method";
   private static final String ACTION_DOES_NOT_EXIST = "ACTION_DOES_NOT_EXIST";
+  private static final String TAG = "ReactNative";
 
   private final ReactApplicationContext reactContext;
   private static final int PAY_ACTIVITY_REQUEST = 888;
@@ -105,9 +113,52 @@ public class EcommpayModule extends ReactContextBaseJavaModule {
     }
   }
 
+
+
+  private void isReadyToPay(Promise promise, String jsonPaymentDataRequest) {
+
+    WritableMap params = Arguments.createMap();
+    Activity currentActivity = getCurrentActivity();
+
+    if(currentActivity == null) {
+      sendEvent(reactContext, "onError", params);
+      return;
+    }
+
+    PaymentsClient mPaymentsClient = Wallet.getPaymentsClient(currentActivity,
+      new Wallet.WalletOptions
+        .Builder()
+        .setEnvironment(WalletConstants.ENVIRONMENT_PRODUCTION)
+        .build());
+
+    IsReadyToPayRequest request = IsReadyToPayRequest.fromJson(jsonPaymentDataRequest);
+    Task<Boolean> task = mPaymentsClient.isReadyToPay(request);
+
+    task.addOnCompleteListener(
+      _task -> {
+        try {
+
+          boolean result =
+            _task.getResult(ApiException.class);
+          if (result) {
+            promise.resolve(true);
+          } else {
+            params.putBoolean("initError", true);
+            sendEvent(reactContext, "onError", params);
+          }
+        } catch (ApiException exception) {
+          params.putBoolean("initError", true);
+          sendEvent(reactContext, "onError", params);
+        }
+      });
+  }
+
+
   @ReactMethod
   public void createPayment(ReadableMap info, Promise promise) {
     try {
+
+
       paymentInfo = PaymentInfoUtility.bind(info);
       promise.resolve(true);
     } catch (Exception e) {
@@ -159,6 +210,7 @@ public class EcommpayModule extends ReactContextBaseJavaModule {
       promise.reject(PAYMENT_INFO_DOES_NOT_EXIST, PAYMENT_INFO_DOES_NOT_EXIST_DESCRIPTION);
     }
     try {
+      isReadyToPay(promise, jsonPaymentDataRequest);
       paymentInfo.setPaymentDataRequest(PaymentDataRequest.fromJson(jsonPaymentDataRequest));
       promise.resolve(jsonPaymentDataRequest);
     } catch (Exception e) {
@@ -268,19 +320,6 @@ public class EcommpayModule extends ReactContextBaseJavaModule {
 
 
 
-  private boolean isGooglePlayServicesAvailable(Activity activity) {
-    GoogleApiAvailability googleApiAvailability = GoogleApiAvailability.getInstance();
-    int status = googleApiAvailability.isGooglePlayServicesAvailable(activity);
-    if(status != ConnectionResult.SUCCESS) {
-      if(googleApiAvailability.isUserResolvableError(status)) {
-        Objects.requireNonNull(googleApiAvailability.getErrorDialog(activity, status, 2404)).show();
-      }
-      return false;
-    }
-    return true;
-  }
-
-
   @ReactMethod
   public void presentPayment(Promise promise) {
     if (paymentInfo == null) {
@@ -291,11 +330,6 @@ public class EcommpayModule extends ReactContextBaseJavaModule {
 
       WritableMap params = Arguments.createMap();
       params.putInt("status", -1);
-
-      if(!isGooglePlayServicesAvailable(currentActivity)) {
-        sendEvent(reactContext, "onError", params);
-        return;
-      }
 
       if (currentActivity == null) {
         promise.reject(E_ACTIVITY_DOES_NOT_EXIST, "Activity doesn't exist");
