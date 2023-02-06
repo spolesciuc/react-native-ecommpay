@@ -157,8 +157,6 @@ public class EcommpayModule extends ReactContextBaseJavaModule {
   @ReactMethod
   public void createPayment(ReadableMap info, Promise promise) {
     try {
-
-
       paymentInfo = PaymentInfoUtility.bind(info);
       promise.resolve(true);
     } catch (Exception e) {
