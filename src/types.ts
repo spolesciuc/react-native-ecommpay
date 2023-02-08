@@ -192,3 +192,8 @@ export enum ActionType {
   Tokenize = 3,
   Verify = 4,
 }
+
+export enum Environment {
+  ENVIRONMENT_PRODUCTION = 1,
+  ENVIRONMENT_TEST = 3,
+}
