@@ -1,6 +1,6 @@
 {
   "name": "react-native-ecommpay",
-  "version": "0.1.14",
+  "version": "0.1.15",
   "description": "Ecommpay SDK for react native apps",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",

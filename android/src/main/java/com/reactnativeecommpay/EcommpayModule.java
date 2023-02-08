@@ -32,10 +32,13 @@ import com.google.android.gms.wallet.PaymentDataRequest;
 import com.google.android.gms.wallet.PaymentsClient;
 import com.google.android.gms.wallet.Wallet;
 import com.google.android.gms.wallet.WalletConstants;
+import com.reactnativeecommpay.utils.GPay;
 import com.reactnativeecommpay.utils.RecurrentInfoUtility;
 import com.reactnativeecommpay.utils.ThemeUtility;
 import com.reactnativeecommpay.utils.PaymentInfoUtility;
 
+
+import org.json.JSONObject;
 
 import java.util.Objects;
 
@@ -48,7 +51,7 @@ public class EcommpayModule extends ReactContextBaseJavaModule {
   private static final String PAYMENT_INFO_DOES_NOT_EXIST = "PAYMENT_INFO_DOES_NOT_EXIST";
   private static final String PAYMENT_INFO_DOES_NOT_EXIST_DESCRIPTION = "Object PaymentInfo does not exist, execute initPayment method";
   private static final String ACTION_DOES_NOT_EXIST = "ACTION_DOES_NOT_EXIST";
-  private static final String TAG = "ReactNative";
+  private static final String NOT_READY_TO_PAY = "NOT_READY_TO_PAY";
 
   private final ReactApplicationContext reactContext;
   private static final int PAY_ACTIVITY_REQUEST = 888;
@@ -337,6 +340,18 @@ public class EcommpayModule extends ReactContextBaseJavaModule {
       promise.resolve(true);
     } catch (Exception e) {
       promise.reject(e);
+    }
+  }
+
+  @ReactMethod
+  public void checkGPayIsEnable(ReadableArray cardNetworks, final Promise promise) {
+    final JSONObject isReadyToPayJson = GPay.getIsReadyToPayRequest(cardNetworks);
+    if (isReadyToPayJson == null) {
+      promise.reject(NOT_READY_TO_PAY, "not ready to pay");
+    }
+    IsReadyToPayRequest request = IsReadyToPayRequest.fromJson(isReadyToPayJson.toString());
+    if (request == null) {
+      promise.reject(NOT_READY_TO_PAY, "not ready to pay");
     }
   }
 }

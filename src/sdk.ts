@@ -3,6 +3,7 @@ import {
   CallbackResponseType,
   ECMPPaymentInfo,
   EcommpayPaymentResponse,
+  Environment,
   PaymentDataRequest,
   RecurrentInfo,
   RecurrentInfoSchedule,
@@ -138,4 +139,11 @@ function callbackReceiver(
     clearListeners();
     onCancel && onCancel(data);
   });
+}
+
+export function checkGPayIsEnable(
+  env: Environment,
+  cardNetworks: string[] = ['AMEX', 'JCB', 'MASTERCARD', 'VISA']
+): Promise<boolean> {
+  return EcommpayNative.checkGPayIsEnable(env, cardNetworks);
 }
