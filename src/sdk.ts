@@ -142,7 +142,7 @@ function callbackReceiver(
 }
 
 export function checkGPayIsEnable(
-  env: Environment,
+  env: Environment = Environment.ENVIRONMENT_PRODUCTION,
   cardNetworks: string[] = ['AMEX', 'JCB', 'MASTERCARD', 'VISA']
 ): Promise<boolean> {
   return EcommpayNative.checkGPayIsEnable(env, cardNetworks);

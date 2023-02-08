@@ -57,6 +57,7 @@ public class EcommpayModule extends ReactContextBaseJavaModule {
   private static final int PAY_ACTIVITY_REQUEST = 888;
   ECMPPaymentInfo paymentInfo;
   ECMPTheme theme = ECMPTheme.getLightTheme();
+  private static final String E_FAILED_TO_DETECT_IF_READY = "E_FAILED_TO_DETECT_IF_READY";
 
   public EcommpayModule(ReactApplicationContext reactContext) {
     super(reactContext);
@@ -344,7 +345,7 @@ public class EcommpayModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void checkGPayIsEnable(ReadableArray cardNetworks, final Promise promise) {
+  public void checkGPayIsEnable(int environment, ReadableArray cardNetworks, final Promise promise) {
     final JSONObject isReadyToPayJson = GPay.getIsReadyToPayRequest(cardNetworks);
     if (isReadyToPayJson == null) {
       promise.reject(NOT_READY_TO_PAY, "not ready to pay");
@@ -353,5 +354,36 @@ public class EcommpayModule extends ReactContextBaseJavaModule {
     if (request == null) {
       promise.reject(NOT_READY_TO_PAY, "not ready to pay");
     }
+
+    Activity activity = getCurrentActivity();
+
+    if (activity == null) {
+      promise.reject(E_ACTIVITY_DOES_NOT_EXIST, "Activity doesn't exist");
+    }
+
+    PaymentsClient mPaymentsClient =
+      Wallet.getPaymentsClient(
+        activity,
+        new Wallet.WalletOptions.Builder()
+          .setEnvironment(environment)
+          .build());
+
+    Task<Boolean> task = mPaymentsClient.isReadyToPay(request);
+    task.addOnCompleteListener(
+      new OnCompleteListener<Boolean>() {
+        @Override
+        public void onComplete(@NonNull Task<Boolean> task) {
+          try {
+            boolean result = task.getResult(ApiException.class);
+            if (result) {
+              promise.resolve(result);
+            } else {
+              promise.reject(NOT_READY_TO_PAY, "not ready to pay");
+            }
+          } catch (ApiException exception) {
+            promise.reject(E_FAILED_TO_DETECT_IF_READY, exception.getMessage());
+          }
+        }
+      });
   }
 }
