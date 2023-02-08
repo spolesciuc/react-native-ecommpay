@@ -20,7 +20,7 @@ Pod::Spec.new do |s|
   if $sqipVersion
       s.dependency 'Paymentpage-sdk-ios', $sqipVersion
   else
-    s.dependency 'Paymentpage-sdk-ios', '1.16.1'
+    s.dependency 'Paymentpage-sdk-ios', '1.16.2'
   end
 
 end
