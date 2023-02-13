@@ -381,4 +381,13 @@ public class EcommpayModule extends ReactContextBaseJavaModule {
       sendEvent(reactContext, "onError", params);
     }
   }
+
+    @ReactMethod
+    public void getWalletId(Promise promise) {
+      if (paymentInfo == null) {
+        promise.reject(NOT_READY_TO_PAY, "not ready to pay");
+      }
+      String walletId = paymentInfo.getCoreRecipientInfo().getWalletId();
+      promise.resolve(walletId);
+    }
 }

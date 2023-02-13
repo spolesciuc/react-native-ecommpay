@@ -147,3 +147,7 @@ export function checkGPayIsEnable(
 ): Promise<boolean> {
   return EcommpayNative.checkGPayIsEnable(env, cardNetworks);
 }
+
+export function getWalletId(): Promise<string> {
+  return EcommpayNative.getWalletId();
+}
