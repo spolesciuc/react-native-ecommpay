@@ -75,22 +75,22 @@ public class EcommpayModule extends ReactContextBaseJavaModule {
 
       if (requestCode == PAY_ACTIVITY_REQUEST) {
         switch (resultCode) {
-          case ECMPActivity.RESULT_SUCCESS: {
-            sendEvent(reactContext, "onSuccess", params);
-            break;
+        case ECMPActivity.RESULT_SUCCESS: {
+          sendEvent(reactContext, "onSuccess", params);
+          break;
+        }
+        case ECMPActivity.RESULT_CANCELLED: {
+          sendEvent(reactContext, "onCancel", params);
+          break;
+        }
+        default: {
+          if (data != null && data.hasExtra(ECMPActivity.DATA_INTENT_EXTRA_ERROR)) {
+            String error = data.getStringExtra(ECMPActivity.DATA_INTENT_EXTRA_ERROR);
+            params.putString("error", error);
           }
-          case ECMPActivity.RESULT_CANCELLED: {
-            sendEvent(reactContext, "onCancel", params);
-            break;
-          }
-          default: {
-            if (data != null && data.hasExtra(ECMPActivity.DATA_INTENT_EXTRA_ERROR)) {
-              String error = data.getStringExtra(ECMPActivity.DATA_INTENT_EXTRA_ERROR);
-              params.putString("error", error);
-            }
-            sendEvent(reactContext, "onError", params);
-            break;
-          }
+          sendEvent(reactContext, "onError", params);
+          break;
+        }
         }
       }
     }
@@ -123,31 +123,31 @@ public class EcommpayModule extends ReactContextBaseJavaModule {
     }
 
     PaymentsClient mPaymentsClient = Wallet.getPaymentsClient(currentActivity,
-            new Wallet.WalletOptions
-                    .Builder()
-                    .setEnvironment(WalletConstants.ENVIRONMENT_PRODUCTION)
-                    .build());
+      new Wallet.WalletOptions
+      .Builder()
+      .setEnvironment(WalletConstants.ENVIRONMENT_PRODUCTION)
+      .build());
 
     IsReadyToPayRequest request = IsReadyToPayRequest.fromJson(jsonPaymentDataRequest);
     Task < Boolean > task = mPaymentsClient.isReadyToPay(request);
 
     task.addOnCompleteListener(
-            _task -> {
-              try {
+      _task -> {
+        try {
 
-                boolean result =
-                        _task.getResult(ApiException.class);
-                if (result) {
-                  promise.resolve(true);
-                } else {
-                  params.putBoolean("initError", true);
-                  sendEvent(reactContext, "onError", params);
-                }
-              } catch (ApiException exception) {
-                params.putBoolean("initError", true);
-                sendEvent(reactContext, "onError", params);
-              }
-            });
+          boolean result =
+            _task.getResult(ApiException.class);
+          if (result) {
+            promise.resolve(true);
+          } else {
+            params.putBoolean("initError", true);
+            sendEvent(reactContext, "onError", params);
+          }
+        } catch (ApiException exception) {
+          params.putBoolean("initError", true);
+          sendEvent(reactContext, "onError", params);
+        }
+      });
   }
 
   @ReactMethod
@@ -285,25 +285,25 @@ public class EcommpayModule extends ReactContextBaseJavaModule {
     }
     try {
       switch (action) {
-        case 1: {
-          paymentInfo.setAction(ECMPPaymentInfo.ActionType.Sale);
-          break;
-        }
-        case 2: {
-          paymentInfo.setAction(ECMPPaymentInfo.ActionType.Auth);
-          break;
-        }
-        case 3: {
-          paymentInfo.setAction(ECMPPaymentInfo.ActionType.Tokenize);
-          break;
-        }
-        case 4: {
-          paymentInfo.setAction(ECMPPaymentInfo.ActionType.Verify);
-          break;
-        }
-        default: {
-          promise.reject(ACTION_DOES_NOT_EXIST, "Action " + action + "doesn't exist");
-        }
+      case 1: {
+        paymentInfo.setAction(ECMPPaymentInfo.ActionType.Sale);
+        break;
+      }
+      case 2: {
+        paymentInfo.setAction(ECMPPaymentInfo.ActionType.Auth);
+        break;
+      }
+      case 3: {
+        paymentInfo.setAction(ECMPPaymentInfo.ActionType.Tokenize);
+        break;
+      }
+      case 4: {
+        paymentInfo.setAction(ECMPPaymentInfo.ActionType.Verify);
+        break;
+      }
+      default: {
+        promise.reject(ACTION_DOES_NOT_EXIST, "Action " + action + "doesn't exist");
+      }
       }
       promise.resolve(action);
     } catch (Exception e) {
@@ -352,29 +352,29 @@ public class EcommpayModule extends ReactContextBaseJavaModule {
       }
 
       PaymentsClient mPaymentsClient =
-              Wallet.getPaymentsClient(
-                      activity,
-                      new Wallet.WalletOptions.Builder()
-                              .setEnvironment(environment)
-                              .build());
+        Wallet.getPaymentsClient(
+          activity,
+          new Wallet.WalletOptions.Builder()
+          .setEnvironment(environment)
+          .build());
 
       Task < Boolean > task = mPaymentsClient.isReadyToPay(request);
       task.addOnCompleteListener(
-              new OnCompleteListener < Boolean > () {
-                @Override
-                public void onComplete(@NonNull Task < Boolean > task) {
-                  try {
-                    boolean result = task.getResult(ApiException.class);
-                    if (result) {
-                      promise.resolve(result);
-                    } else {
-                      promise.reject(NOT_READY_TO_PAY, "not ready to pay");
-                    }
-                  } catch (ApiException exception) {
-                    promise.reject(E_FAILED_TO_DETECT_IF_READY, exception.getMessage());
-                  }
-                }
-              });
+        new OnCompleteListener < Boolean > () {
+          @Override
+          public void onComplete(@NonNull Task < Boolean > task) {
+            try {
+              boolean result = task.getResult(ApiException.class);
+              if (result) {
+                promise.resolve(result);
+              } else {
+                promise.reject(NOT_READY_TO_PAY, "not ready to pay");
+              }
+            } catch (ApiException exception) {
+              promise.reject(E_FAILED_TO_DETECT_IF_READY, exception.getMessage());
+            }
+          }
+        });
 
     } catch (Exception e) {
       WritableMap params = Arguments.createMap();
@@ -382,12 +382,18 @@ public class EcommpayModule extends ReactContextBaseJavaModule {
     }
   }
 
-    @ReactMethod
-    public void getWalletId(Promise promise) {
-      if (paymentInfo == null) {
-        promise.reject(NOT_READY_TO_PAY, "not ready to pay");
-      }
-      String walletId = paymentInfo.getCoreRecipientInfo().getWalletId();
-      promise.resolve(walletId);
+  @ReactMethod
+  public void getWalletId(Promise promise) {
+    if (paymentInfo == null) {
+      promise.reject(NOT_READY_TO_PAY, "not ready to pay");
     }
+
+    if (paymentInfo.getCoreRecipientInfo() == null) {
+      promise.resolve(null);
+      return;
+    }
+
+    String walletId = paymentInfo.getCoreRecipientInfo().getWalletId();
+    promise.resolve(walletId);
+  }
 }
