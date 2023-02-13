@@ -37,12 +37,9 @@ import com.reactnativeecommpay.utils.RecurrentInfoUtility;
 import com.reactnativeecommpay.utils.ThemeUtility;
 import com.reactnativeecommpay.utils.PaymentInfoUtility;
 
-
 import org.json.JSONObject;
 
 import java.util.Objects;
-
-
 
 @ReactModule(name = EcommpayModule.NAME)
 public class EcommpayModule extends ReactContextBaseJavaModule {
@@ -105,8 +102,6 @@ public class EcommpayModule extends ReactContextBaseJavaModule {
     return NAME;
   }
 
-
-
   @ReactMethod
   public void setTheme(ReadableMap options, @Nullable Boolean isDark, Promise promise) {
     try {
@@ -117,46 +112,43 @@ public class EcommpayModule extends ReactContextBaseJavaModule {
     }
   }
 
-
-
   private void isReadyToPay(Promise promise, String jsonPaymentDataRequest) {
 
     WritableMap params = Arguments.createMap();
     Activity currentActivity = getCurrentActivity();
 
-    if(currentActivity == null) {
+    if (currentActivity == null) {
       sendEvent(reactContext, "onError", params);
       return;
     }
 
     PaymentsClient mPaymentsClient = Wallet.getPaymentsClient(currentActivity,
-      new Wallet.WalletOptions
-        .Builder()
-        .setEnvironment(WalletConstants.ENVIRONMENT_PRODUCTION)
-        .build());
+            new Wallet.WalletOptions
+                    .Builder()
+                    .setEnvironment(WalletConstants.ENVIRONMENT_PRODUCTION)
+                    .build());
 
     IsReadyToPayRequest request = IsReadyToPayRequest.fromJson(jsonPaymentDataRequest);
-    Task<Boolean> task = mPaymentsClient.isReadyToPay(request);
+    Task < Boolean > task = mPaymentsClient.isReadyToPay(request);
 
     task.addOnCompleteListener(
-      _task -> {
-        try {
+            _task -> {
+              try {
 
-          boolean result =
-            _task.getResult(ApiException.class);
-          if (result) {
-            promise.resolve(true);
-          } else {
-            params.putBoolean("initError", true);
-            sendEvent(reactContext, "onError", params);
-          }
-        } catch (ApiException exception) {
-          params.putBoolean("initError", true);
-          sendEvent(reactContext, "onError", params);
-        }
-      });
+                boolean result =
+                        _task.getResult(ApiException.class);
+                if (result) {
+                  promise.resolve(true);
+                } else {
+                  params.putBoolean("initError", true);
+                  sendEvent(reactContext, "onError", params);
+                }
+              } catch (ApiException exception) {
+                params.putBoolean("initError", true);
+                sendEvent(reactContext, "onError", params);
+              }
+            });
   }
-
 
   @ReactMethod
   public void createPayment(ReadableMap info, Promise promise) {
@@ -273,7 +265,6 @@ public class EcommpayModule extends ReactContextBaseJavaModule {
     }
   }
 
-
   @ReactMethod
   public void setLanguageCode(String value, Promise promise) {
     if (paymentInfo == null) {
@@ -320,8 +311,6 @@ public class EcommpayModule extends ReactContextBaseJavaModule {
     }
   }
 
-
-
   @ReactMethod
   public void presentPayment(Promise promise) {
     if (paymentInfo == null) {
@@ -346,44 +335,50 @@ public class EcommpayModule extends ReactContextBaseJavaModule {
 
   @ReactMethod
   public void checkGPayIsEnable(int environment, ReadableArray cardNetworks, final Promise promise) {
-    final JSONObject isReadyToPayJson = GPay.getIsReadyToPayRequest(cardNetworks);
-    if (isReadyToPayJson == null) {
-      promise.reject(NOT_READY_TO_PAY, "not ready to pay");
+    try {
+      final JSONObject isReadyToPayJson = GPay.getIsReadyToPayRequest(cardNetworks);
+      if (isReadyToPayJson == null) {
+        promise.reject(NOT_READY_TO_PAY, "not ready to pay");
+      }
+      IsReadyToPayRequest request = IsReadyToPayRequest.fromJson(isReadyToPayJson.toString());
+      if (request == null) {
+        promise.reject(NOT_READY_TO_PAY, "not ready to pay");
+      }
+
+      Activity activity = getCurrentActivity();
+
+      if (activity == null) {
+        promise.reject(E_ACTIVITY_DOES_NOT_EXIST, "Activity doesn't exist");
+      }
+
+      PaymentsClient mPaymentsClient =
+              Wallet.getPaymentsClient(
+                      activity,
+                      new Wallet.WalletOptions.Builder()
+                              .setEnvironment(environment)
+                              .build());
+
+      Task < Boolean > task = mPaymentsClient.isReadyToPay(request);
+      task.addOnCompleteListener(
+              new OnCompleteListener < Boolean > () {
+                @Override
+                public void onComplete(@NonNull Task < Boolean > task) {
+                  try {
+                    boolean result = task.getResult(ApiException.class);
+                    if (result) {
+                      promise.resolve(result);
+                    } else {
+                      promise.reject(NOT_READY_TO_PAY, "not ready to pay");
+                    }
+                  } catch (ApiException exception) {
+                    promise.reject(E_FAILED_TO_DETECT_IF_READY, exception.getMessage());
+                  }
+                }
+              });
+
+    } catch (Exception e) {
+      WritableMap params = Arguments.createMap();
+      sendEvent(reactContext, "onError", params);
     }
-    IsReadyToPayRequest request = IsReadyToPayRequest.fromJson(isReadyToPayJson.toString());
-    if (request == null) {
-      promise.reject(NOT_READY_TO_PAY, "not ready to pay");
-    }
-
-    Activity activity = getCurrentActivity();
-
-    if (activity == null) {
-      promise.reject(E_ACTIVITY_DOES_NOT_EXIST, "Activity doesn't exist");
-    }
-
-    PaymentsClient mPaymentsClient =
-      Wallet.getPaymentsClient(
-        activity,
-        new Wallet.WalletOptions.Builder()
-          .setEnvironment(environment)
-          .build());
-
-    Task<Boolean> task = mPaymentsClient.isReadyToPay(request);
-    task.addOnCompleteListener(
-      new OnCompleteListener<Boolean>() {
-        @Override
-        public void onComplete(@NonNull Task<Boolean> task) {
-          try {
-            boolean result = task.getResult(ApiException.class);
-            if (result) {
-              promise.resolve(result);
-            } else {
-              promise.reject(NOT_READY_TO_PAY, "not ready to pay");
-            }
-          } catch (ApiException exception) {
-            promise.reject(E_FAILED_TO_DETECT_IF_READY, exception.getMessage());
-          }
-        }
-      });
   }
 }
